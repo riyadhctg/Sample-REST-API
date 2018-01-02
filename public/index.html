@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <title>Scientific Discoveries</title>
+      <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+      <link href="/styles.css" rel="stylesheet" />
+   </head>
+   <body>
+      <h1 class="title">Scientific Discoveries</h1>
+      <div id="homepage">
+         <h1>Enter a year and learn about the scientific discoveries in that period</h1>
+         <div id="discoveries"></div>
+      </div>
+      <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+      <script src="https://unpkg.com/react@15/dist/react.js"></script>
+      <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+      <!-- Create React Component -->
+      <script type="text/babel">
+         var Discoveries = React.createClass({
+             getInitialState: function(){
+                 return({
+                     discoveries: [],
+                     discovery: []
+                 });
+             },
+             render: function(){
+                 var discoveries = this.state.discoveries;
+                 //console.log(discoveries.length);
+                 discoveries = discoveries.map(function(discovery, index){
+                     //console.log(discovery.length);
+                     /*
+                     In the below code, "discoveries.length>0" ensures data is loaded 
+                     before querying takes place
+                     */
+                     return(
+                         <li key={index}>
+                             <p className="Year"><b>{discoveries.length>0 && discoveries[index].Year}</b></p>
+                             <p className="Discovery">{discoveries.length>0 && discoveries[index].Discovery}</p> 
+                         </li>
+                     );
+                 });
+                 return(
+                     <div id="discovery-container">
+                         <form id="search" onSubmit={this.handleSubmit}>
+                             <label>Enter a year:</label>
+                             <input type="number" ref="year" placeholder="year" required />
+                             <input type="submit" value="Show Discoveries" />
+                         </form>
+                         <ul>{discoveries}</ul>
+                     </div>
+                 );
+             },
+             handleSubmit: function(e){
+                 e.preventDefault();
+                 var year = this.refs.year.value;
+                 
+                 fetch('/api/discoveries?year=' + year).then(function(data){
+                     return data.json();
+                 }).then( json => {
+                     this.setState({
+                         discoveries: json
+                     });
+                     console.log(json);
+                 });
+             }
+         });
+         ReactDOM.render(<Discoveries />, document.getElementById('discoveries'));
+      </script>
+   </body>
+</html>
